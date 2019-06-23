@@ -1,0 +1,26 @@
+{
+  "name": "clientVue",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ax": "^0.2.2",
+    "axios": "^0.19.0",
+    "vue": "^2.6.10",
+    "vue-goo": "0.0.1",
+    "vue-google": "0.0.0",
+    "vue-google-login": "^2.0.0",
+    "vue-google-oauth2": "^1.4.0",
+    "vue-hot-reload-api": "^2.3.3"
+  },
+  "devDependencies": {
+    "@vue/component-compiler-utils": "^3.0.0",
+    "vue-template-compiler": "^2.6.10"
+  }
+}

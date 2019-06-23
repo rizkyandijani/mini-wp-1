@@ -1,0 +1,3 @@
+# vue goo
+
+this project will be bringing many of the 'react-babylonjs' goodies into vue. stay tuned...
