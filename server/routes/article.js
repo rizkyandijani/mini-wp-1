@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const ArticleController = require('../controllers/article')
 const upload = require('../helpers/images')
-const cekTag = require('../helpers/googleVision')
+// const cekTag = require('../helpers/googleVision')
 
 const authentication = require('../middlewares/authentication')
 
