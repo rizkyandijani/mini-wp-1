@@ -47,6 +47,17 @@ class ArticleController{
         .catch(next)
     }
 
+    static localTag(req,res,next){
+        console.log('ini reqfile di controller local tag',req.file);
+        if(req.file.tags.length != 0){
+            res.status(200).json(req.file.tags)
+        }else{
+            res.status(404).json({
+                message : 'no recommendation tags found'
+            })
+        }
+    }
+
     static create(req,res,next){
         console.log('logged user ====>',req.loggedUser);
         console.log('req.body di yoi',req.body);

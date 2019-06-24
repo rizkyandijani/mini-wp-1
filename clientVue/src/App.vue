@@ -372,6 +372,18 @@ export default {
             this.file = event.target.files[0]
             this.newArticle.image = this.file
             console.log('file masuk',this.file);
+
+            let formData = new FormData()
+            formData.append('image',this.file)
+
+            ax.post('/articles/cekTag',formData)
+            .then(({data}) =>{
+                console.log(data);
+                this.newArticle.selectedTags = data
+            })
+            .catch(err =>{
+                console.log(err.response.data);
+            })
         },
 
         createArticle(){

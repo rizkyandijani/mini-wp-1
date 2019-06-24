@@ -14881,12 +14881,23 @@ var _default = {
       });
     },
     uploadImage: function uploadImage() {
+      var _this5 = this;
+
       this.file = '', this.file = event.target.files[0];
       this.newArticle.image = this.file;
       console.log('file masuk', this.file);
+      var formData = new FormData();
+      formData.append('image', this.file);
+      ax.post('/articles/cekTag', formData).then(function (_ref5) {
+        var data = _ref5.data;
+        console.log(data);
+        _this5.newArticle.selectedTags = data;
+      }).catch(function (err) {
+        console.log(err.response.data);
+      });
     },
     createArticle: function createArticle() {
-      var _this5 = this;
+      var _this6 = this;
 
       $("#loadingModal").modal('show');
       var formData = new FormData();
@@ -14895,16 +14906,16 @@ var _default = {
       formData.append('description', this.newArticle.description);
       formData.append('content', this.newArticle.content);
       formData.append('tags', this.newArticle.selectedTags);
-      ax.post('/articles', formData).then(function (_ref5) {
-        var data = _ref5.data;
+      ax.post('/articles', formData).then(function (_ref6) {
+        var data = _ref6.data;
         $("#loadingModal").modal('hide');
         Swal.fire('successfully create article', '', 'success');
 
-        _this5.emptyForm();
+        _this6.emptyForm();
 
-        _this5.getArticle();
+        _this6.getArticle();
 
-        _this5.getAllTag();
+        _this6.getAllTag();
       }).catch(function (err) {
         console.log(err.response);
       });
@@ -14938,38 +14949,38 @@ var _default = {
       }
     },
     getDetailData: function getDetailData(id) {
-      var _this6 = this;
+      var _this7 = this;
 
-      ax.get("articles/".concat(id)).then(function (_ref6) {
-        var data = _ref6.data;
+      ax.get("articles/".concat(id)).then(function (_ref7) {
+        var data = _ref7.data;
         var arrTag = data.tags.split(',');
         var detail = data;
         detail.tags = arrTag;
         console.log(detail);
-        _this6.detailData = detail;
+        _this7.detailData = detail;
       }).catch(function (err) {
         console.log(err.response.data);
       });
     },
     getEditData: function getEditData(id) {
-      var _this7 = this;
+      var _this8 = this;
 
       console.log(id);
-      ax.get("articles/".concat(id)).then(function (_ref7) {
-        var data = _ref7.data;
+      ax.get("articles/".concat(id)).then(function (_ref8) {
+        var data = _ref8.data;
         var arrTag = data.tags.split(','); // console.log('article',data);
 
-        _this7.newArticle.title = data.title, _this7.newArticle.description = data.description || '', _this7.newArticle.content = data.content;
-        _this7.newArticle.image = data.image;
-        _this7.newArticle.selectedTags = arrTag;
-        _this7.newArticle.id = data._id;
+        _this8.newArticle.title = data.title, _this8.newArticle.description = data.description || '', _this8.newArticle.content = data.content;
+        _this8.newArticle.image = data.image;
+        _this8.newArticle.selectedTags = arrTag;
+        _this8.newArticle.id = data._id;
         $("#modalCreateArticle").modal('show');
       }).catch(function (err) {
         console.log(err.response.data);
       });
     },
     editArticle: function editArticle(id) {
-      var _this8 = this;
+      var _this9 = this;
 
       $("#loadingModal").modal('show');
       var formData = new FormData();
@@ -14978,29 +14989,29 @@ var _default = {
       formData.append('description', this.newArticle.description);
       formData.append('content', this.newArticle.content);
       formData.append('tags', this.newArticle.selectedTags);
-      ax.patch("articles/".concat(id), formData).then(function (_ref8) {
-        var data = _ref8.data;
+      ax.patch("articles/".concat(id), formData).then(function (_ref9) {
+        var data = _ref9.data;
         $("#loadingModal").modal('hide');
         Swal.fire('successfully edit article', '', 'success');
-        _this8.articles = [];
+        _this9.articles = [];
 
-        _this8.getArticle();
+        _this9.getArticle();
 
-        _this8.getAllTag();
+        _this9.getAllTag();
       }).catch(function (err) {
         console.log(err.response.data);
       });
     },
     deleteArticle: function deleteArticle(id) {
-      var _this9 = this;
+      var _this10 = this;
 
       console.log(id);
-      ax.delete("/articles/".concat(id)).then(function (_ref9) {
-        var data = _ref9.data;
+      ax.delete("/articles/".concat(id)).then(function (_ref10) {
+        var data = _ref10.data;
 
-        _this9.getArticle();
+        _this10.getArticle();
 
-        _this9.getAllTag();
+        _this10.getAllTag();
       }).catch(function (err) {
         console.log(err.response);
       });
@@ -15022,11 +15033,11 @@ var _default = {
   },
   computed: {
     filteredResources: function filteredResources() {
-      var _this10 = this;
+      var _this11 = this;
 
       if (this.searchQuery) {
         return this.articles.filter(function (item) {
-          return item.title.toLowerCase().includes(_this10.searchQuery.toLowerCase());
+          return item.title.toLowerCase().includes(_this11.searchQuery.toLowerCase());
         });
       } else {
         return this.articles;
@@ -16282,7 +16293,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43555" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38217" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
