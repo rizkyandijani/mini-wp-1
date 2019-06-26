@@ -38,11 +38,24 @@ class ArticleController{
         .catch(next)
     }
 
+    // static getUserArticle(req,res,next){
+    //     console.log('req logged user',req.loggedUser.id);
+    //     Article
+    //     .find({userId : req.params.userId})
+    //     .then(articles =>{
+    //         res.status(200).json(articles)
+    //     })
+    //     .catch(next)
+    // }
+
     static getUserArticle(req,res,next){
+        console.log('masuk get user controller');
         Article
-        .find({userId : req.loggedUser.id})
-        .then(article =>{
-            res.status(200).json(article)
+        .find({userId : req.params.userId})
+        .then(data =>{
+            console.log('data nya',data);
+            
+            res.status(200).json(data)
         })
         .catch(next)
     }

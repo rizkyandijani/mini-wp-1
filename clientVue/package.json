@@ -12,6 +12,7 @@
   "dependencies": {
     "ax": "^0.2.2",
     "axios": "^0.19.0",
+    "scrollreveal": "^4.0.5",
     "vue": "^2.6.10",
     "vue-goo": "0.0.1",
     "vue-google": "0.0.0",

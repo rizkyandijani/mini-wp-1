@@ -12631,7 +12631,7 @@ var _default = {
       tags: this.article.tags.split(',')
     };
   },
-  props: ['article', 'idUser'],
+  props: ['article', 'idUser', "profile"],
   methods: {
     emitCard: function emitCard(type, data) {
       if (type === 'delete' && this.article.author === localStorage.userId) {
@@ -12725,20 +12725,22 @@ exports.default = _default;
       ),
       _vm._v(" "),
       _c("div", { staticClass: "row justify-content-center mb-2" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-outline-dark mr-2",
-            staticStyle: { padding: "5 5px" },
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.emitCard("delete", _vm.article._id)
-              }
-            }
-          },
-          [_vm._v("delete")]
-        ),
+        _vm.profile
+          ? _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-dark mr-2",
+                staticStyle: { padding: "5 5px" },
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.emitCard("delete", _vm.article._id)
+                  }
+                }
+              },
+              [_vm._v("delete")]
+            )
+          : _vm._e(),
         _vm._v(" "),
         _c(
           "button",
@@ -12755,20 +12757,22 @@ exports.default = _default;
           [_vm._v("detail")]
         ),
         _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-outline-dark ml-2",
-            staticStyle: { padding: "5 5px" },
-            attrs: { type: "button" },
-            on: {
-              click: function($event) {
-                return _vm.emitCard("edit", _vm.article._id)
-              }
-            }
-          },
-          [_vm._v("edit")]
-        ),
+        _vm.profile
+          ? _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-dark ml-2",
+                staticStyle: { padding: "5 5px" },
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.emitCard("edit", _vm.article._id)
+                  }
+                }
+              },
+              [_vm._v("edit")]
+            )
+          : _vm._e(),
         _vm._v("\n        " + _vm._s(_vm.idUser) + "\n    ")
       ])
     ]
@@ -14704,27 +14708,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 var ax = _axios.default.create({
   baseURL: 'http://localhost:3000'
 });
@@ -14760,28 +14743,41 @@ var _default = {
       edit: false,
       detail: false,
       detailData: '',
-      idUser: localStorage.userId
+      idUser: localStorage.userId,
+      profile: false
     };
   },
   methods: {
     loggedIn: function loggedIn() {
+      // console.log('logged in trigerred');
       this.isLogin = true, this.page = 'main';
       ax.defaults.headers.common['token'] = localStorage.token;
+
+      if (this.profile === true) {
+        this.getUserArticle();
+      } else {
+        this.getArticle();
+      }
+
+      this.getAllTag();
+    },
+    toHome: function toHome() {
+      this.profile = false;
       this.getArticle();
       this.getAllTag();
-      console.log(this.tags);
+    },
+    toProfile: function toProfile() {
+      this.profile = true, this.getUserArticle();
+      this.getAllTag();
     },
     fromLogin: function fromLogin(data) {
       var _this = this;
 
       if (data === 'toRegister') {
-        console.log('masuk mau ubah state ke register');
         this.landForm = 'register';
       } else if (data === 'signout') {
         this.signOut();
       } else if (data.type === 'google') {
-        console.log('masuk dari login google', data);
-        console.log('data token', data.token);
         (0, _axios.default)({
           method: 'post',
           url: 'http://localhost:3000/users/loginGoogle',
@@ -14790,11 +14786,9 @@ var _default = {
           }
         }).then(function (_ref) {
           var data = _ref.data;
-          console.log('dapet data success login', data);
 
           _this.successLogin(data);
         }).catch(function (err) {
-          console.log('yah error');
           console.log(err.response);
         });
       } else {
@@ -14804,8 +14798,8 @@ var _default = {
           password: data.password
         }).then(function (_ref2) {
           var data = _ref2.data;
-          console.log(data);
 
+          // console.log(data);
           _this.successLogin(data);
         }).catch(function (err) {
           console.log(err.response.data);
@@ -14825,10 +14819,8 @@ var _default = {
       var _this2 = this;
 
       if (data === 'toLogin') {
-        console.log('trigerred ubahs state ke login');
         this.landForm = 'login';
       } else {
-        console.log('ini ada data object register', data);
         ax.post('/users/register', data).then(function (user) {
           Swal.fire('sucessfully registered', '', 'success');
           _this2.landForm = 'login';
@@ -14853,10 +14845,7 @@ var _default = {
             _this3.objectTag[tag] = tag;
           });
         });
-        console.log('ini array', array);
         _this3.tags = array.sort();
-        console.log('semua tag', _this3.tags);
-        console.log('iki object tag', _this3.objectTag);
       }).catch(function (err) {
         console.log(err.response.data);
       });
@@ -14874,30 +14863,38 @@ var _default = {
 
       ax.get("".concat(link)).then(function (_ref4) {
         var data = _ref4.data;
-        console.log(data);
         _this4.articles = data;
       }).catch(function (err) {
         console.log(err.response);
       });
     },
-    uploadImage: function uploadImage() {
+    getUserArticle: function getUserArticle() {
       var _this5 = this;
+
+      ax.get("/articles/".concat(localStorage.userId, "/userArticle")).then(function (_ref5) {
+        var data = _ref5.data;
+        _this5.articles = data;
+      }).catch(function (err) {
+        console.log(err.response);
+      });
+    },
+    uploadImage: function uploadImage() {
+      var _this6 = this;
 
       this.file = '', this.file = event.target.files[0];
       this.newArticle.image = this.file;
       console.log('file masuk', this.file);
       var formData = new FormData();
       formData.append('image', this.file);
-      ax.post('/articles/cekTag', formData).then(function (_ref5) {
-        var data = _ref5.data;
-        console.log(data);
-        _this5.newArticle.selectedTags = data;
+      ax.post('/articles/cekTag', formData).then(function (_ref6) {
+        var data = _ref6.data;
+        _this6.newArticle.selectedTags = data;
       }).catch(function (err) {
         console.log(err.response.data);
       });
     },
     createArticle: function createArticle() {
-      var _this6 = this;
+      var _this7 = this;
 
       $("#loadingModal").modal('show');
       var formData = new FormData();
@@ -14906,22 +14903,21 @@ var _default = {
       formData.append('description', this.newArticle.description);
       formData.append('content', this.newArticle.content);
       formData.append('tags', this.newArticle.selectedTags);
-      ax.post('/articles', formData).then(function (_ref6) {
-        var data = _ref6.data;
+      ax.post('/articles', formData).then(function (_ref7) {
+        var data = _ref7.data;
         $("#loadingModal").modal('hide');
         Swal.fire('successfully create article', '', 'success');
 
-        _this6.emptyForm();
+        _this7.emptyForm();
 
-        _this6.getArticle();
+        _this7.getArticle();
 
-        _this6.getAllTag();
+        _this7.getAllTag();
       }).catch(function (err) {
         console.log(err.response);
       });
     },
     emptyForm: function emptyForm() {
-      console.log('empty form jalan');
       this.newArticle = {
         title: '',
         description: '',
@@ -14933,14 +14929,11 @@ var _default = {
     },
     fromCard: function fromCard(data) {
       if (data.type === 'delete') {
-        console.log('masuk delete');
         this.deleteArticle(data.id);
       } else if (data.type === 'detail') {
-        console.log('masuk detail');
         this.getDetailData(data.id);
         this.detail = true;
       } else if (data.type === 'edit') {
-        console.log('masuk edit');
         this.edit = true;
         this.getEditData(data.id);
       } else {
@@ -14949,38 +14942,36 @@ var _default = {
       }
     },
     getDetailData: function getDetailData(id) {
-      var _this7 = this;
+      var _this8 = this;
 
-      ax.get("articles/".concat(id)).then(function (_ref7) {
-        var data = _ref7.data;
+      ax.get("articles/".concat(id)).then(function (_ref8) {
+        var data = _ref8.data;
         var arrTag = data.tags.split(',');
         var detail = data;
         detail.tags = arrTag;
-        console.log(detail);
-        _this7.detailData = detail;
+        _this8.detailData = detail;
       }).catch(function (err) {
         console.log(err.response.data);
       });
     },
     getEditData: function getEditData(id) {
-      var _this8 = this;
+      var _this9 = this;
 
       console.log(id);
-      ax.get("articles/".concat(id)).then(function (_ref8) {
-        var data = _ref8.data;
-        var arrTag = data.tags.split(','); // console.log('article',data);
-
-        _this8.newArticle.title = data.title, _this8.newArticle.description = data.description || '', _this8.newArticle.content = data.content;
-        _this8.newArticle.image = data.image;
-        _this8.newArticle.selectedTags = arrTag;
-        _this8.newArticle.id = data._id;
+      ax.get("articles/".concat(id)).then(function (_ref9) {
+        var data = _ref9.data;
+        var arrTag = data.tags.split(',');
+        _this9.newArticle.title = data.title, _this9.newArticle.description = data.description || '', _this9.newArticle.content = data.content;
+        _this9.newArticle.image = data.image;
+        _this9.newArticle.selectedTags = arrTag;
+        _this9.newArticle.id = data._id;
         $("#modalCreateArticle").modal('show');
       }).catch(function (err) {
         console.log(err.response.data);
       });
     },
     editArticle: function editArticle(id) {
-      var _this9 = this;
+      var _this10 = this;
 
       $("#loadingModal").modal('show');
       var formData = new FormData();
@@ -14989,29 +14980,28 @@ var _default = {
       formData.append('description', this.newArticle.description);
       formData.append('content', this.newArticle.content);
       formData.append('tags', this.newArticle.selectedTags);
-      ax.patch("articles/".concat(id), formData).then(function (_ref9) {
-        var data = _ref9.data;
+      ax.patch("articles/".concat(id), formData).then(function (_ref10) {
+        var data = _ref10.data;
         $("#loadingModal").modal('hide');
         Swal.fire('successfully edit article', '', 'success');
-        _this9.articles = [];
+        _this10.articles = [];
 
-        _this9.getArticle();
+        _this10.getArticle();
 
-        _this9.getAllTag();
+        _this10.getAllTag();
       }).catch(function (err) {
         console.log(err.response.data);
       });
     },
     deleteArticle: function deleteArticle(id) {
-      var _this10 = this;
+      var _this11 = this;
 
-      console.log(id);
-      ax.delete("/articles/".concat(id)).then(function (_ref10) {
-        var data = _ref10.data;
+      ax.delete("/articles/".concat(id)).then(function (_ref11) {
+        var data = _ref11.data;
 
-        _this10.getArticle();
+        _this11.getArticle();
 
-        _this10.getAllTag();
+        _this11.getAllTag();
       }).catch(function (err) {
         console.log(err.response);
       });
@@ -15033,11 +15023,11 @@ var _default = {
   },
   computed: {
     filteredResources: function filteredResources() {
-      var _this11 = this;
+      var _this12 = this;
 
       if (this.searchQuery) {
         return this.articles.filter(function (item) {
-          return item.title.toLowerCase().includes(_this11.searchQuery.toLowerCase());
+          return item.title.toLowerCase().includes(_this12.searchQuery.toLowerCase());
         });
       } else {
         return this.articles;
@@ -15183,7 +15173,46 @@ $(document).ready(function () {
             },
             attrs: { id: "sidebar" }
           },
-          [_vm._m(1), _vm._v(" "), _vm._m(2)]
+          [
+            _vm._m(1),
+            _vm._v(" "),
+            _c("ul", { staticClass: "list-unstyled components" }, [
+              _c("li", {}, [
+                _c(
+                  "a",
+                  {
+                    attrs: { href: "#" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        return _vm.toHome($event)
+                      }
+                    }
+                  },
+                  [_c("i", { staticClass: "fas fa-home mr-2" }), _vm._v("Home")]
+                )
+              ]),
+              _vm._v(" "),
+              _c("li", {}, [
+                _c(
+                  "a",
+                  {
+                    attrs: { href: "#", "aria-expanded": "false" },
+                    on: {
+                      click: function($event) {
+                        $event.preventDefault()
+                        return _vm.toProfile($event)
+                      }
+                    }
+                  },
+                  [
+                    _c("i", { staticClass: "fas fa-check-square mr-2" }),
+                    _vm._v("Your Article")
+                  ]
+                )
+              ])
+            ])
+          ]
         ),
         _vm._v(" "),
         _c(
@@ -15203,7 +15232,7 @@ $(document).ready(function () {
             _c(
               "div",
               {
-                staticClass: "modal-dialog modal-lg",
+                staticClass: "modal-dialog modal-lg modal-dialog-centered",
                 attrs: { role: "document" }
               },
               [
@@ -15212,7 +15241,7 @@ $(document).ready(function () {
                   {
                     staticClass: "modal-content",
                     staticStyle: {
-                      "background-color": "rgba(49, 49, 51, 0.6)",
+                      "background-color": "rgba(49, 49, 51, 0.9)",
                       color: "white"
                     }
                   },
@@ -15248,7 +15277,7 @@ $(document).ready(function () {
                             )
                           : _vm._e(),
                         _vm._v(" "),
-                        _vm._m(3)
+                        _vm._m(2)
                       ]
                     ),
                     _vm._v(" "),
@@ -15524,7 +15553,7 @@ $(document).ready(function () {
           ]
         ),
         _vm._v(" "),
-        _vm._m(4),
+        _vm._m(3),
         _vm._v(" "),
         _c(
           "div",
@@ -15563,7 +15592,7 @@ $(document).ready(function () {
                   _c(
                     "div",
                     {
-                      staticClass: "card col-4",
+                      staticClass: "card col-8",
                       staticStyle: { "background-color": "grey" }
                     },
                     [
@@ -15650,11 +15679,43 @@ $(document).ready(function () {
                 _c("div", { staticClass: "col-12 p-5" }, [
                   _c(
                     "div",
+                    { staticClass: "col-12 d-flex justify-content-center" },
+                    [
+                      _c(
+                        "h2",
+                        {
+                          directives: [
+                            {
+                              name: "show",
+                              rawName: "v-show",
+                              value: _vm.profile,
+                              expression: "profile"
+                            }
+                          ]
+                        },
+                        [_vm._v("Profile Page")]
+                      ),
+                      _vm._v(" "),
+                      _vm.tagQuery
+                        ? _c("h2", [
+                            _vm._v("Search By Tag : "),
+                            _c("b", [_vm._v(_vm._s(_vm.tagQuery))])
+                          ])
+                        : _vm._e()
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
                     { staticClass: "row justify-content-center" },
                     _vm._l(_vm.filteredResources, function(article) {
                       return _c("articleCard", {
                         key: article._id,
-                        attrs: { article: article, localStorageId: _vm.idUser },
+                        attrs: {
+                          article: article,
+                          localStorageId: _vm.idUser,
+                          profile: _vm.profile
+                        },
                         on: { cardToParent: _vm.fromCard }
                       })
                     }),
@@ -15668,12 +15729,15 @@ $(document).ready(function () {
               ? _c("div", { staticClass: "d-flex justify-content-center" }, [
                   _c(
                     "div",
-                    { staticClass: "card", staticStyle: { width: "100%" } },
+                    {
+                      staticClass: "card col-10 offset-1",
+                      staticStyle: { width: "100%" }
+                    },
                     [
                       _c("div", { staticClass: "card-body" }, [
                         _c(
                           "div",
-                          { staticClass: "d-flex justify-content-center" },
+                          { staticClass: "d-flex justify-content-center p-3" },
                           [
                             _c("img", {
                               staticStyle: {
@@ -15690,39 +15754,61 @@ $(document).ready(function () {
                         _vm._v(" "),
                         _c("br"),
                         _vm._v(" "),
-                        _c("span", [
-                          _vm._v(
-                            "Author : " +
-                              _vm._s(_vm.detailData.userId.firstName) +
-                              " " +
-                              _vm._s(_vm.detailData.userId.lastName)
-                          )
+                        _c("h4", [_vm._v(_vm._s(_vm.detailData.title))]),
+                        _vm._v(" "),
+                        _c("br"),
+                        _vm._v(" "),
+                        _c("b", [
+                          _c("span", [
+                            _vm._v(
+                              "Author : " +
+                                _vm._s(_vm.detailData.userId.firstName) +
+                                " " +
+                                _vm._s(_vm.detailData.userId.lastName)
+                            )
+                          ])
                         ]),
                         _vm._v(" "),
                         _c("br"),
                         _vm._v(" "),
+                        _c("br"),
+                        _vm._v(" "),
                         _c("span", {
+                          staticStyle: { color: "black" },
                           domProps: {
                             innerHTML: _vm._s(_vm.detailData.content)
                           }
                         })
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "card-footer" }, [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary",
-                            attrs: { id: "back-to-list", type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.detail = false
-                              }
+                      _c(
+                        "div",
+                        { staticClass: "card-footer" },
+                        [
+                          _c("span", [_vm._v("Tags : ")]),
+                          _vm._v(" "),
+                          _vm._l(_vm.detailData.tags, function(tag, index) {
+                            return _c("span", { key: index }, [
+                              _vm._v(" #" + _vm._s(tag) + " ")
+                            ])
+                          })
+                        ],
+                        2
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "col-2 offset-5 btn btn-dark",
+                          attrs: { id: "back-to-list", type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.detail = false
                             }
-                          },
-                          [_vm._v("back")]
-                        )
-                      ])
+                          }
+                        },
+                        [_vm._v("back")]
+                      )
                     ]
                   )
                 ])
@@ -15760,7 +15846,7 @@ $(document).ready(function () {
             attrs: { id: "contentLogin" }
           },
           [
-            _vm._m(5),
+            _vm._m(4),
             _vm._v(" "),
             _c(
               "div",
@@ -15844,92 +15930,6 @@ var staticRenderFns = [
     return _c("div", { staticClass: "sidebar-header" }, [
       _c("h3", { staticStyle: { "font-family": "Montserrat" } }, [
         _vm._v("Navigation")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("ul", { staticClass: "list-unstyled components" }, [
-      _c("li", {}, [
-        _c("a", { attrs: { href: "#" } }, [
-          _c("i", { staticClass: "fas fa-home mr-2" }),
-          _vm._v("Home")
-        ])
-      ]),
-      _vm._v(" "),
-      _c("li", {}, [
-        _c(
-          "a",
-          {
-            staticClass: "dropdown-toggle",
-            attrs: {
-              href: "#homeSubmenu",
-              "data-toggle": "collapse",
-              "aria-expanded": "false"
-            }
-          },
-          [
-            _c("i", { staticClass: "fas fa-check-square mr-2" }),
-            _vm._v("Published")
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "ul",
-          {
-            staticClass: "collapse list-unstyled",
-            attrs: { id: "homeSubmenu" }
-          },
-          [
-            _c("li", [_c("a", { attrs: { href: "#" } }, [_vm._v("Home 1")])]),
-            _vm._v(" "),
-            _c("li", [_c("a", { attrs: { href: "#" } }, [_vm._v("Home 2")])]),
-            _vm._v(" "),
-            _c("li", [_c("a", { attrs: { href: "#" } }, [_vm._v("Home 3")])])
-          ]
-        )
-      ]),
-      _vm._v(" "),
-      _c("li", [
-        _c(
-          "a",
-          {
-            staticClass: "dropdown-toggle",
-            attrs: {
-              href: "#pageSubmenu",
-              "data-toggle": "collapse",
-              "aria-expanded": "false"
-            }
-          },
-          [
-            _c("i", { staticClass: "fas fa-pencil-ruler mr-2" }),
-            _vm._v("Draft")
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "ul",
-          {
-            staticClass: "collapse list-unstyled",
-            attrs: { id: "pageSubmenu" }
-          },
-          [
-            _c("li", [_c("a", { attrs: { href: "#" } }, [_vm._v("Page 1")])]),
-            _vm._v(" "),
-            _c("li", [_c("a", { attrs: { href: "#" } }, [_vm._v("Page 2")])]),
-            _vm._v(" "),
-            _c("li", [_c("a", { attrs: { href: "#" } }, [_vm._v("Page 3")])])
-          ]
-        )
-      ]),
-      _vm._v(" "),
-      _c("li", [
-        _c("a", { attrs: { href: "#" } }, [
-          _c("i", { staticClass: "fas fa-id-card mr-2" }),
-          _vm._v("Contact")
-        ])
       ])
     ])
   },
@@ -16293,7 +16293,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38217" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "35903" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -7,9 +7,9 @@
             <p style="color: black">Tag : </p><button @click="emitCard('tagSearch',tag)" type="button" class="btn btn-dark mr-1 ml-1 mb-1" v-for="(tag,index) in tags" :key="index" style="padding: 0 3px;font-size: 14px;">{{tag}}</button>
         </div>
         <div class="row justify-content-center mb-2">
-            <button @click="emitCard('delete',article._id)" type="button" class="btn btn-outline-dark mr-2" style="padding: 5 5px;">delete</button>
+            <button v-if="profile" @click="emitCard('delete',article._id)" type="button" class="btn btn-outline-dark mr-2" style="padding: 5 5px;">delete</button>
             <button @click="emitCard('detail',article._id)" type="button" class="btn btn-outline-dark" style="padding: 5 5px;">detail</button>
-            <button @click="emitCard('edit',article._id)" type="button" class="btn btn-outline-dark ml-2" style="padding: 5 5px;">edit</button>
+            <button v-if="profile" @click="emitCard('edit',article._id)" type="button" class="btn btn-outline-dark ml-2" style="padding: 5 5px;">edit</button>
             {{idUser}}
         </div>
     </div>  
@@ -23,7 +23,7 @@ export default {
             tags : this.article.tags.split(',')
         }
     },
-    props : ['article','idUser'],
+    props : ['article','idUser',"profile"],
     methods : {
         emitCard(type,data){
             if(type === 'delete' && this.article.author === localStorage.userId){

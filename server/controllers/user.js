@@ -140,7 +140,7 @@ class userController{
                         email : user.email
                     }
                     console.log(payload,'ini google');
-                    const token = sign({payload},`${process.env.SECRET_KEY}`)
+                    const token = sign(payload,`${process.env.SECRET_KEY}`)
                     res.status(200).json({
                         token,
                         firstName: user.firstName,

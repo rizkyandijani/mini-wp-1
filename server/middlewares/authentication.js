@@ -5,28 +5,17 @@ module.exports = function(req,res,next){
         let decoded = verify(req.headers.token,`${process.env.SECRET_KEY}`)
         console.log('ini decoded',decoded);
         let option = {}
-        if(decoded.payload){
-            option = {
-                email : decoded.payload.email
-            }    
-        }else{
             option = {
                 email : decoded.email
             }
-        }
-        
         User.findOne(option)
         .then(user =>{
             console.log('ini user authen',user);
-            
             if(user){
-                if(decoded.payload){
-                    req.loggedUser = decoded.payload
-                    next()
-                }else{
                     req.loggedUser = decoded
+                    console.log('oke logged user keisi');
+                    
                     next()
-                }
             }else {
                 next({msg : `token is not recognized`,code : 404})
             }

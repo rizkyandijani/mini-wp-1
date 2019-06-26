@@ -14,6 +14,7 @@ router.post('/cekTag', uploadToLocal.single('image'), cekTag ,ArticleController.
 
 router.get('/',ArticleController.getAll)
 router.get('/:articleId',ArticleController.getOne)
+router.get('/:userId/userArticle',ArticleController.getUserArticle)
 router.post('/',upload.multer.single('image'),upload.sendUploadToGCS,ArticleController.create)
 router.patch('/:articleId',upload.multer.single('image'),upload.sendUploadToGCS,ArticleController.update)
 router.delete('/:articleId',ArticleController.delete)

@@ -30,44 +30,16 @@
                                 </div>
                                 <ul class="list-unstyled components">
                                     <li class="">
-                                        <a href="#"><i class="fas fa-home mr-2" ></i>Home</a>
+                                        <a href="#" @click.prevent="toHome"><i class="fas fa-home mr-2" ></i>Home</a>
                                     </li>
                                     <li class="">
-                                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i class="fas fa-check-square mr-2"></i>Published</a>
-                                        <ul class="collapse list-unstyled" id="homeSubmenu">
-                                            <li>
-                                                <a href="#">Home 1</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Home 2</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Home 3</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i class="fas fa-pencil-ruler mr-2"></i>Draft</a>
-                                        <ul class="collapse list-unstyled" id="pageSubmenu">
-                                            <li>
-                                                <a href="#">Page 1</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Page 2</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Page 3</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="#"><i class="fas fa-id-card mr-2"></i>Contact</a>
+                                        <a href="#" @click.prevent="toProfile"  aria-expanded="false" ><i class="fas fa-check-square mr-2"></i>Your Article</a>
                                     </li>
                                 </ul>
                     </nav>
                     <div class="modal fade" id="modalCreateArticle" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="font-size: 18px; margin: 0;padding: 0">
-                        <div class="modal-dialog modal-lg" role="document">
-                            <div class="modal-content" style="background-color: rgba(49, 49, 51, 0.6); color: white;">
+                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                            <div class="modal-content" style="background-color: rgba(49, 49, 51, 0.9); color: white;">
                             <div class="modal-header" style="border-bottom: none">
                                 <h5 v-if="!edit" class="modal-title" id="ModalLabel" style="font-weight: bold">Create Article</h5>
                                 <h5 v-if="edit" class="modal-title" id="ModalLabel" style="font-weight: bold">Edit Article</h5>                                
@@ -124,7 +96,7 @@
                     <div v-show="isLogin" id="content-container" class="jumbotron" style="background : none;margin-bottom: 0; background-size: cover;">
                         <div v-show="!detail">
                             <div class="d-flex justify-content-center">
-                                <div class="card col-4" style="background-color: grey">
+                                <div class="card col-8" style="background-color: grey">
                                     <div class=" col">
                                         <form class="form mb-2 mt-2">
                                         <input v-model="searchQuery" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="background-color: white">
@@ -137,28 +109,35 @@
                                 </div>
                             </div>
                             <div class="col-12 p-5" style="">
+                                <div class="col-12 d-flex justify-content-center">
+                                <h2 v-show="profile">Profile Page</h2>
+                                 <h2 v-if="tagQuery">Search By Tag : <b>{{tagQuery}}</b></h2>
+
+                                </div>
                                 <div class="row justify-content-center">
-                                    <articleCard v-for="article in filteredResources" :key="article._id" v-bind:article="article" v-bind:localStorageId="idUser" v-on:cardToParent="fromCard"></articleCard>
+                                    <articleCard v-for="article in filteredResources" :key="article._id" v-bind:article="article" v-bind:localStorageId="idUser" v-bind:profile="profile" v-on:cardToParent="fromCard"></articleCard>
                                 </div>
                             </div>    
                         </div>
                         <div v-if="detail" class="d-flex justify-content-center">
-                            <div class="card" style="width : 100%">
-                                <!-- <div class="card-header">
-                                    <h3>{{detailData.title}}</h3>
-                                </div> -->
+                            <div class="card col-10 offset-1" style="width : 100%">
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-center">
+                                    <div class="d-flex justify-content-center p-3">
                                         <img style="width : 100%; max-height: 800px;; " v-bind:src=detailData.image alt="articleImage">
                                     </div>
                                     <br>
-                                    <span>Author : {{detailData.userId.firstName}} {{detailData.userId.lastName}}</span>
+                                    <h4>{{detailData.title}}</h4>
                                     <br>
-                                    <span v-html="detailData.content"></span>
+                                    <b><span>Author : {{detailData.userId.firstName}} {{detailData.userId.lastName}}</span></b>
+                                    <br>
+                                    <br>
+                                    <span style="color : black" v-html="detailData.content"></span>
                                 </div>
                                 <div class="card-footer">
-                                    <button id="back-to-list" type="button" class="btn btn-primary" v-on:click="detail = false">back</button>
+                                    <span>Tags : </span>
+                                    <span v-for="(tag,index) in detailData.tags" :key=index> #{{tag}} </span>
                                 </div>
+                                    <button id="back-to-list" type="button" class="col-2 offset-5 btn btn-dark" v-on:click="detail = false">back</button>
                             </div>
                         </div>
                     </div>
@@ -229,33 +208,49 @@ export default {
             edit : false,
             detail : false,
             detailData : '',
-            idUser : localStorage.userId
+            idUser : localStorage.userId,
+            profile : false
         }
     },
     methods : {
 
         loggedIn(){
+            // console.log('logged in trigerred');
+            
             this.isLogin = true,
             this.page = 'main'
             ax.defaults.headers.common['token'] = localStorage.token
-            this.getArticle()
+            if(this.profile === true){
+                this.getUserArticle()
+            }else{
+                this.getArticle()
+            }
             this.getAllTag()
-            console.log(this.tags);
-            
             
         },
+
+        toHome(){
+            
+            this.profile = false
+            this.getArticle()
+            this.getAllTag()
+        },
+
+        toProfile(){
+
+            this.profile = true,
+            this.getUserArticle()
+            this.getAllTag()
+        },
+
         fromLogin(data){
             if(data === 'toRegister'){
-                console.log('masuk mau ubah state ke register');
                 this.landForm = 'register'
             }
             else if( data === 'signout'){
                 this.signOut()
             }
             else if(data.type === 'google'){
-                console.log('masuk dari login google',data);
-                
-                console.log('data token',data.token);
                 axios({
                     method: 'post',
                     url: 'http://localhost:3000/users/loginGoogle',
@@ -263,13 +258,10 @@ export default {
                         id_token : data.token
                     }
                 })
-                .then(({data})=>{
-                    console.log('dapet data success login',data);
-                    
+                .then(({data})=>{                    
                     this.successLogin(data)
                 })
                 .catch(err=>{
-                    console.log('yah error');
                     console.log(err.response);
                     
                 })
@@ -281,7 +273,7 @@ export default {
                     password : data.password
                 })
                 .then(({data})=>{
-                    console.log(data);
+                    // console.log(data);
                     this.successLogin(data)
                 })
                 .catch(err =>{
@@ -302,11 +294,9 @@ export default {
 
         fromRegister(data){
             if(data === 'toLogin'){
-                console.log('trigerred ubahs state ke login');
                 
                 this.landForm = 'login'
             }else{
-                console.log('ini ada data object register', data);
                 ax.post('/users/register',data)
                 .then(user =>{
                     Swal.fire('sucessfully registered', '', 'success')
@@ -337,11 +327,8 @@ export default {
                         this.objectTag[tag] = tag
                     })
                 })
-                console.log('ini array',array);
                 
             this.tags = array.sort()
-            console.log('semua tag',this.tags);
-            console.log('iki object tag',this.objectTag);
             
             
             })
@@ -359,7 +346,16 @@ export default {
             }
             ax.get(`${link}`)
             .then(({data})=>{
-                console.log(data);
+                this.articles = data
+            })
+            .catch(err =>{
+                console.log(err.response);
+            })
+        },
+
+        getUserArticle(){
+            ax.get(`/articles/${localStorage.userId}/userArticle`)
+            .then(({data}) =>{
                 this.articles = data
             })
             .catch(err =>{
@@ -378,7 +374,6 @@ export default {
 
             ax.post('/articles/cekTag',formData)
             .then(({data}) =>{
-                console.log(data);
                 this.newArticle.selectedTags = data
             })
             .catch(err =>{
@@ -410,7 +405,6 @@ export default {
         },
 
         emptyForm(){
-            console.log('empty form jalan');
             
             this.newArticle = {
                 title : '',
@@ -425,15 +419,11 @@ export default {
 
         fromCard(data){
             if(data.type === 'delete'){
-                console.log('masuk delete');
-                
                 this.deleteArticle(data.id)
             }else if(data.type === 'detail'){
-                console.log('masuk detail');
                 this.getDetailData(data.id)
                 this.detail = true
             }else if(data.type === 'edit'){
-                console.log('masuk edit');                
                 this.edit = true
                 this.getEditData(data.id)
             }else{
@@ -448,7 +438,6 @@ export default {
                 let arrTag = data.tags.split(',')
                 let detail = data
                 detail.tags = arrTag
-                console.log(detail);
                 this.detailData = detail
             })
             .catch(err =>{
@@ -462,7 +451,6 @@ export default {
             .then(({data}) =>{
                 let arrTag = data.tags.split(',')
                 
-                // console.log('article',data);
                 this.newArticle.title = data.title,
                 this.newArticle.description = data.description || '',
                 this.newArticle.content = data.content
@@ -500,7 +488,6 @@ export default {
         },
 
         deleteArticle(id){
-            console.log(id);
             ax.delete(`/articles/${id}`)
             .then(({data})=>{
                 this.getArticle()
