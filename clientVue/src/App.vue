@@ -94,7 +94,7 @@
                         </div>
                     </div>
                     <div v-show="isLogin" id="content-container" class="jumbotron" style="background : none;margin-bottom: 0; background-size: cover;">
-                        <div v-show="!detail">
+                        <div v-show="!detail" class="animated fadeInUp delay-0.5s">
                             <div class="d-flex justify-content-center">
                                 <div class="card col-8" style="background-color: grey">
                                     <div class=" col">
@@ -119,7 +119,7 @@
                                 </div>
                             </div>    
                         </div>
-                        <div v-if="detail" class="d-flex justify-content-center">
+                        <div v-if="detail" class="d-flex justify-content-center animated fadeInUp delay-0.5s">
                             <div class="card col-10 offset-1" style="width : 100%">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-center p-3">
@@ -139,6 +139,15 @@
                                 </div>
                                     <button id="back-to-list" type="button" class="col-2 offset-5 btn btn-dark" v-on:click="detail = false">back</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-show="page === 'main'" class="footer" style="background-color : #002949; position : fixed; bottom : 0; width : 100%; color: white; font-family : Montserrat; height : 40px; z-index: 2">
+                    <div class="container col d-flex align-content-center justify-content-between flex-wrap">
+                        <h6 style="margin-top : 10px;">Copy Right @2019 : Rizky Andi Jani</h6>
+                        <div style="margin-top : 10px;">
+                        <a class="mr-3" href="https://github.com/rizkyandijani"><i class="fab fa-github fa-lg"></i></a>
+                        <a class="mr-3" href="https://www.linkedin.com/in/rizky-andijani-7629ba121/"><i class="fab fa-linkedin fa-lg"></i></a>
                         </div>
                     </div>
                 </div>
@@ -478,7 +487,7 @@ export default {
                 $("#loadingModal").modal('hide')
                 Swal.fire('successfully edit article','','success')
                 this.articles = []
-                this.getArticle()
+                this.getUserArticle()
                 this.getAllTag()
             })
             .catch(err =>{
@@ -488,32 +497,48 @@ export default {
         },
 
         deleteArticle(id){
-            ax.delete(`/articles/${id}`)
-            .then(({data})=>{
-                this.getArticle()
-                this.getAllTag()
-
-            })
-            .catch(err =>{
-                console.log(err.response);
-            })
+                   Swal.fire({
+                        title : 'are you sure want to delete article ?',
+                        type : 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#DD6B55',
+                        confirmButtonText: 'Yes, I am sure!',
+                        cancelButtonText: "No, cancel it!",
+                    })
+                    .then(result =>{
+                        if(result.value){
+                            ax.delete(`/articles/${id}`)
+                            .then(({data})=>{
+                                Swal.fire(`sucesfully delete article`,'','success')
+                                this.getUserArticle()
+                                this.getAllTag()
+                            })
+                            .catch(err =>{
+                                console.log(err.response);
+                            })
+                        }
+                    }) 
+            
             
         },
 
         signOut(){
-            // if(gapi.auth2 != undefined){
-            //     var auth2 = gapi.auth2.getAuthInstance()
-            //     auth.signOut()
-            //     .then(()=>{
-            //         localStorage.clear()
-            //         this.isLogin = false
-            //         this.page = "landingPage"
-            //     })
-            // }else{
-                localStorage.clear()
-                this.isLogin = false
-                this.page = "landingPage"
-            
+                Swal.fire({
+                    title : 'are you sure?',
+                    type : 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#DD6B55',
+                    confirmButtonText: 'Yes, I am sure!',
+                    cancelButtonText: "No, cancel it!",
+                })
+                .then(result =>{
+                    if(result.value){
+                        Swal.fire(`goodbye ${localStorage.name}`,'','success')
+                        localStorage.clear()
+                        this.isLogin = false
+                        this.page = "landingPage"
+                    }
+                })                
         }
     },
     computed : {

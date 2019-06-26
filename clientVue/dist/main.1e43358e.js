@@ -14708,6 +14708,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var ax = _axios.default.create({
   baseURL: 'http://localhost:3000'
 });
@@ -14986,7 +14995,7 @@ var _default = {
         Swal.fire('successfully edit article', '', 'success');
         _this10.articles = [];
 
-        _this10.getArticle();
+        _this10.getUserArticle();
 
         _this10.getAllTag();
       }).catch(function (err) {
@@ -14996,38 +15005,55 @@ var _default = {
     deleteArticle: function deleteArticle(id) {
       var _this11 = this;
 
-      ax.delete("/articles/".concat(id)).then(function (_ref11) {
-        var data = _ref11.data;
+      Swal.fire({
+        title: 'are you sure want to delete article ?',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DD6B55',
+        confirmButtonText: 'Yes, I am sure!',
+        cancelButtonText: "No, cancel it!"
+      }).then(function (result) {
+        if (result.value) {
+          ax.delete("/articles/".concat(id)).then(function (_ref11) {
+            var data = _ref11.data;
+            Swal.fire("sucesfully delete article", '', 'success');
 
-        _this11.getArticle();
+            _this11.getUserArticle();
 
-        _this11.getAllTag();
-      }).catch(function (err) {
-        console.log(err.response);
+            _this11.getAllTag();
+          }).catch(function (err) {
+            console.log(err.response);
+          });
+        }
       });
     },
     signOut: function signOut() {
-      // if(gapi.auth2 != undefined){
-      //     var auth2 = gapi.auth2.getAuthInstance()
-      //     auth.signOut()
-      //     .then(()=>{
-      //         localStorage.clear()
-      //         this.isLogin = false
-      //         this.page = "landingPage"
-      //     })
-      // }else{
-      localStorage.clear();
-      this.isLogin = false;
-      this.page = "landingPage";
+      var _this12 = this;
+
+      Swal.fire({
+        title: 'are you sure?',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DD6B55',
+        confirmButtonText: 'Yes, I am sure!',
+        cancelButtonText: "No, cancel it!"
+      }).then(function (result) {
+        if (result.value) {
+          Swal.fire("goodbye ".concat(localStorage.name), '', 'success');
+          localStorage.clear();
+          _this12.isLogin = false;
+          _this12.page = "landingPage";
+        }
+      });
     }
   },
   computed: {
     filteredResources: function filteredResources() {
-      var _this12 = this;
+      var _this13 = this;
 
       if (this.searchQuery) {
         return this.articles.filter(function (item) {
-          return item.title.toLowerCase().includes(_this12.searchQuery.toLowerCase());
+          return item.title.toLowerCase().includes(_this13.searchQuery.toLowerCase());
         });
       } else {
         return this.articles;
@@ -15585,7 +15611,8 @@ $(document).ready(function () {
                     value: !_vm.detail,
                     expression: "!detail"
                   }
-                ]
+                ],
+                staticClass: "animated fadeInUp delay-0.5s"
               },
               [
                 _c("div", { staticClass: "d-flex justify-content-center" }, [
@@ -15726,96 +15753,131 @@ $(document).ready(function () {
             ),
             _vm._v(" "),
             _vm.detail
-              ? _c("div", { staticClass: "d-flex justify-content-center" }, [
-                  _c(
-                    "div",
-                    {
-                      staticClass: "card col-10 offset-1",
-                      staticStyle: { width: "100%" }
-                    },
-                    [
-                      _c("div", { staticClass: "card-body" }, [
-                        _c(
-                          "div",
-                          { staticClass: "d-flex justify-content-center p-3" },
-                          [
-                            _c("img", {
-                              staticStyle: {
-                                width: "100%",
-                                "max-height": "800px"
-                              },
-                              attrs: {
-                                src: _vm.detailData.image,
-                                alt: "articleImage"
-                              }
-                            })
-                          ]
-                        ),
-                        _vm._v(" "),
-                        _c("br"),
-                        _vm._v(" "),
-                        _c("h4", [_vm._v(_vm._s(_vm.detailData.title))]),
-                        _vm._v(" "),
-                        _c("br"),
-                        _vm._v(" "),
-                        _c("b", [
-                          _c("span", [
-                            _vm._v(
-                              "Author : " +
-                                _vm._s(_vm.detailData.userId.firstName) +
-                                " " +
-                                _vm._s(_vm.detailData.userId.lastName)
-                            )
-                          ])
+              ? _c(
+                  "div",
+                  {
+                    staticClass:
+                      "d-flex justify-content-center animated fadeInUp delay-0.5s"
+                  },
+                  [
+                    _c(
+                      "div",
+                      {
+                        staticClass: "card col-10 offset-1",
+                        staticStyle: { width: "100%" }
+                      },
+                      [
+                        _c("div", { staticClass: "card-body" }, [
+                          _c(
+                            "div",
+                            {
+                              staticClass: "d-flex justify-content-center p-3"
+                            },
+                            [
+                              _c("img", {
+                                staticStyle: {
+                                  width: "100%",
+                                  "max-height": "800px"
+                                },
+                                attrs: {
+                                  src: _vm.detailData.image,
+                                  alt: "articleImage"
+                                }
+                              })
+                            ]
+                          ),
+                          _vm._v(" "),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("h4", [_vm._v(_vm._s(_vm.detailData.title))]),
+                          _vm._v(" "),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("b", [
+                            _c("span", [
+                              _vm._v(
+                                "Author : " +
+                                  _vm._s(_vm.detailData.userId.firstName) +
+                                  " " +
+                                  _vm._s(_vm.detailData.userId.lastName)
+                              )
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("br"),
+                          _vm._v(" "),
+                          _c("span", {
+                            staticStyle: { color: "black" },
+                            domProps: {
+                              innerHTML: _vm._s(_vm.detailData.content)
+                            }
+                          })
                         ]),
                         _vm._v(" "),
-                        _c("br"),
+                        _c(
+                          "div",
+                          { staticClass: "card-footer" },
+                          [
+                            _c("span", [_vm._v("Tags : ")]),
+                            _vm._v(" "),
+                            _vm._l(_vm.detailData.tags, function(tag, index) {
+                              return _c("span", { key: index }, [
+                                _vm._v(" #" + _vm._s(tag) + " ")
+                              ])
+                            })
+                          ],
+                          2
+                        ),
                         _vm._v(" "),
-                        _c("br"),
-                        _vm._v(" "),
-                        _c("span", {
-                          staticStyle: { color: "black" },
-                          domProps: {
-                            innerHTML: _vm._s(_vm.detailData.content)
-                          }
-                        })
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        { staticClass: "card-footer" },
-                        [
-                          _c("span", [_vm._v("Tags : ")]),
-                          _vm._v(" "),
-                          _vm._l(_vm.detailData.tags, function(tag, index) {
-                            return _c("span", { key: index }, [
-                              _vm._v(" #" + _vm._s(tag) + " ")
-                            ])
-                          })
-                        ],
-                        2
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "button",
-                        {
-                          staticClass: "col-2 offset-5 btn btn-dark",
-                          attrs: { id: "back-to-list", type: "button" },
-                          on: {
-                            click: function($event) {
-                              _vm.detail = false
+                        _c(
+                          "button",
+                          {
+                            staticClass: "col-2 offset-5 btn btn-dark",
+                            attrs: { id: "back-to-list", type: "button" },
+                            on: {
+                              click: function($event) {
+                                _vm.detail = false
+                              }
                             }
-                          }
-                        },
-                        [_vm._v("back")]
-                      )
-                    ]
-                  )
-                ])
+                          },
+                          [_vm._v("back")]
+                        )
+                      ]
+                    )
+                  ]
+                )
               : _vm._e()
           ]
         )
-      ])
+      ]),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          directives: [
+            {
+              name: "show",
+              rawName: "v-show",
+              value: _vm.page === "main",
+              expression: "page === 'main'"
+            }
+          ],
+          staticClass: "footer",
+          staticStyle: {
+            "background-color": "#002949",
+            position: "fixed",
+            bottom: "0",
+            width: "100%",
+            color: "white",
+            "font-family": "Montserrat",
+            height: "40px",
+            "z-index": "2"
+          }
+        },
+        [_vm._m(4)]
+      )
     ]),
     _vm._v(" "),
     _c(
@@ -15846,7 +15908,7 @@ $(document).ready(function () {
             attrs: { id: "contentLogin" }
           },
           [
-            _vm._m(4),
+            _vm._m(5),
             _vm._v(" "),
             _c(
               "div",
@@ -15987,6 +16049,45 @@ var staticRenderFns = [
             ])
           ]
         )
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass:
+          "container col d-flex align-content-center justify-content-between flex-wrap"
+      },
+      [
+        _c("h6", { staticStyle: { "margin-top": "10px" } }, [
+          _vm._v("Copy Right @2019 : Rizky Andi Jani")
+        ]),
+        _vm._v(" "),
+        _c("div", { staticStyle: { "margin-top": "10px" } }, [
+          _c(
+            "a",
+            {
+              staticClass: "mr-3",
+              attrs: { href: "https://github.com/rizkyandijani" }
+            },
+            [_c("i", { staticClass: "fab fa-github fa-lg" })]
+          ),
+          _vm._v(" "),
+          _c(
+            "a",
+            {
+              staticClass: "mr-3",
+              attrs: {
+                href: "https://www.linkedin.com/in/rizky-andijani-7629ba121/"
+              }
+            },
+            [_c("i", { staticClass: "fab fa-linkedin fa-lg" })]
+          )
+        ])
       ]
     )
   },
@@ -16293,7 +16394,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "35903" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34587" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
