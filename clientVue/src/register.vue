@@ -4,11 +4,11 @@
             <form @submit.prevent="emitting('passdata')" class="col-8 offset-2 text-center" style="font-family: Cinzel;color: white; padding: 5px; font-weight: bold">
                 <div class="form-group">
                     <label  for="firstNameRegister">First Name</label>
-                    <input v-model="register.firstName" type="text" class="form-control" id="firstName" aria-describedby="emailHelp" placeholder="Enter email">
+                    <input v-model="register.firstName" type="text" class="form-control" id="firstName" aria-describedby="emailHelp" placeholder="Enter First Name">
                 </div>
                 <div class="form-group">
                     <label for="lastNameRegister">Last Name</label>
-                    <input v-model="register.lastName" type="text" class="form-control" id="lastName" aria-describedby="emailHelp" placeholder="Enter email">
+                    <input v-model="register.lastName" type="text" class="form-control" id="lastName" aria-describedby="emailHelp" placeholder="Enter Last Name">
                 </div>
                 <div class="form-group">
                     <label for="exampleInputEmail1">Email</label>

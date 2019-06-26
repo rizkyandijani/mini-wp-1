@@ -9,7 +9,7 @@ const port = 3000
 const route = require('./routes/index')
 const errorHandler = require('./middlewares/errorHandler')
 
-mongoose.connect('mongodb://localhost/go-blogg',{useNewUrlParser : true})
+mongoose.connect(process.env.MONGO_DB_URL,{useNewUrlParser : true})
 
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
